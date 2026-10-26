@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ScoreManager {
+﻿namespace ScoreManager {
+    /// <summary>
+    /// 生徒のデータを扱う処理を担当するクラス
+    /// </summary>
     internal class ScoreManager {
     }
 }
