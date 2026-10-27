@@ -17,7 +17,7 @@
         /// テストの点数
         /// </summary>
         public int Score { get; set; }
-
+        
         /// <summary>
         /// コンストラクタ
         /// </summary>
