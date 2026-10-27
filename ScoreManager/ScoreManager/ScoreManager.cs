@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -9,6 +10,21 @@ namespace ScoreManager {
     /// 生徒のデータを扱う処理を担当するクラス
     /// </summary>
     internal class ScoreManager {
+        /// <summary>
+        /// 名前のバリデーション（ひらがな / カタカナ / 漢字 / 英字 のみ可）
+        /// </summary>
+        private const string C_RegexPatternOfName = @"^[\p{IsHiragana}\p{IsKatakana}\p{IsCJKUnifiedIdeographs}a-zA-Z]+$";
+
+        /// <summary>
+        /// 科目のバリデーション（ひらがな / カタカナ / 漢字 のみ可）
+        /// </summary>
+        private const string C_RegexPatternOfSubject = @"^[\p{IsHiragana}\p{IsKatakana}\p{IsCJKUnifiedIdeographs}]+$";
+
+        /// <summary>
+        /// 点数のバリデーション（0～100 の整数値 のみ可）
+        /// </summary>
+        private const string C_RegexPatternOfScoreText = @"^(100|[1-9]?[0-9])$";
+
         /// <summary>
         /// 不正でない生徒のデータのクラスを保持するリスト
         /// </summary>
@@ -28,39 +44,43 @@ namespace ScoreManager {
                 while (!wFile.EndOfStream) {
                     string wLine = wFile.ReadLine();
 
-                    // --- 空行・コメント行のスキップ ---
                     if (string.IsNullOrWhiteSpace(wLine) || wLine.TrimStart().StartsWith("#")) {
                         continue;
                     }
-
-                    string[] wData = wLine.Split(',');
-                    
-                    // --- 文字列のバリデーションチェック ---
-                    // 項目数が不正
-                    if (wData.Length != 3) {
-                        Console.WriteLine($"不正な行（項目数不正）: {wLine}");
-                        continue;
-                    }
-                    // 名前が不正（ひらがな / カタカナ / 漢字 / 英字 のみ可）
-                    if (!Regex.IsMatch(wData[0].Trim(), @"^[\p{IsHiragana}\p{IsKatakana}\p{IsCJKUnifiedIdeographs}a-zA-Z]+$")) {
-                        Console.WriteLine($"名前が不正: {wData[0]}");
-                        continue;
-                    }
-                    // 科目が不正（ひらがな / カタカナ / 漢字 のみ可）
-                    if (!Regex.IsMatch(wData[1].Trim(), @"^[\p{IsHiragana}\p{IsKatakana}\p{IsCJKUnifiedIdeographs}]+$")) {
-                        Console.WriteLine($"科目が不正: {wData[1]}");
-                        continue;
-                    }
-                    // 成績が不正（0～100 の整数値 のみ可）
-                    if (!Regex.IsMatch(wData[2].Trim(), @"^(100|[1-9]?[0-9])$")) {
-                        Console.WriteLine($"成績が不正: {wData[2]}");
-                        continue;
-                    }
-                    StudentScore wStudentScore = new StudentScore(wData[0].Trim(), wData[1].Trim(), int.Parse(wData[2].Trim()));
-                    FStudentScores.Add(wStudentScore);
+                    AddValidatedScoreToList(wLine);
                 }
             }
             Console.WriteLine($"{FStudentScores.Count} 件のデータを読み込みました。");
+        }
+
+        /// <summary>
+        /// バリデーションに沿った成績のみリストに格納するメソッド
+        /// </summary>
+        /// <param name="vText">成績の文字列</param>  
+        private void AddValidatedScoreToList(string vText) {
+
+            string[] wSplitText = vText.Split(',');
+            if (wSplitText.Length != 3 || wSplitText.Any(s => string.IsNullOrWhiteSpace(s))) {
+                Console.WriteLine($"不正な行（項目数不正）: {vText}");
+                return;
+            }
+            string wName = wSplitText[0].Trim();
+            if (!Regex.IsMatch(wName, C_RegexPatternOfName)) {
+                Console.WriteLine($"名前が不正: {wName}");
+                return;
+            }
+            string wSubject = wSplitText[1].Trim();
+            if (!Regex.IsMatch(wSubject, C_RegexPatternOfSubject)) {
+                Console.WriteLine($"科目が不正: {wSubject}");
+                return;
+            }
+            string wScoreText = wSplitText[2].Trim();
+            if (!Regex.IsMatch(wScoreText, C_RegexPatternOfScoreText)) {
+                Console.WriteLine($"成績が不正: {wScoreText}");
+                return;
+            }
+            var wStudentScore = new StudentScore(wName, wSubject, int.Parse(wScoreText));
+            FStudentScores.Add(wStudentScore);
         }
     }
 }

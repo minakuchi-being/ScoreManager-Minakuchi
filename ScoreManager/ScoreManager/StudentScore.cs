@@ -12,7 +12,7 @@
         /// テストの科目
         /// </summary>
         public string Subject { get; set; }
-        
+
         /// <summary>
         /// テストの点数
         /// </summary>
@@ -25,9 +25,9 @@
         /// <param name="vSubject">設定するテストの科目</param>
         /// <param name="vScore">設定するテストの点数</param>
         public StudentScore(string vName, string vSubject, int vScore) {
-            Name = vName;
-            Subject = vSubject;
-            Score = vScore;
+            this.Name = vName;
+            this.Subject = vSubject;
+            this.Score = vScore;
         }
     }
 }
