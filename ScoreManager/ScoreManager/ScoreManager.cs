@@ -56,25 +56,25 @@ namespace ScoreManager {
         /// <summary>
         /// バリデーションに沿った成績のみリストに格納するメソッド
         /// </summary>
-        /// <param name="vText">成績の文字列</param>  
-        private void AddValidatedScoreToList(string vText) {
+        /// <param name="vLine">CSVの1行</param>  
+        private void AddValidatedScoreToList(string vLine) {
 
-            string[] wSplitText = vText.Split(',');
-            if (wSplitText.Length != 3 || wSplitText.Any(s => string.IsNullOrWhiteSpace(s))) {
-                Console.WriteLine($"不正な行（項目数不正）: {vText}");
+            string[] wItems = vLine.Split(',');
+            if (wItems.Length != 3 || wItems.Any(x => string.IsNullOrWhiteSpace(x))) {
+                Console.WriteLine($"不正な行（項目数不正）: {vLine}");
                 return;
             }
-            string wName = wSplitText[0].Trim();
+            string wName = wItems[0].Trim();
             if (!Regex.IsMatch(wName, C_RegexPatternOfName)) {
                 Console.WriteLine($"名前が不正: {wName}");
                 return;
             }
-            string wSubject = wSplitText[1].Trim();
+            string wSubject = wItems[1].Trim();
             if (!Regex.IsMatch(wSubject, C_RegexPatternOfSubject)) {
                 Console.WriteLine($"科目が不正: {wSubject}");
                 return;
             }
-            string wScoreText = wSplitText[2].Trim();
+            string wScoreText = wItems[2].Trim();
             if (!Regex.IsMatch(wScoreText, C_RegexPatternOfScoreText)) {
                 Console.WriteLine($"成績が不正: {wScoreText}");
                 return;
