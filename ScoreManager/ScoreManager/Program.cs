@@ -13,6 +13,9 @@ namespace ScoreManager {
 
             string wFilePath = Path.Combine(AppContext.BaseDirectory, C_DefaultScoreFileName);
             wScoreManager.LoadCSV(wFilePath);
+
+            Console.WriteLine("=== 成績一覧 ===");
+            wScoreManager.DisplayAllScores();
         }
     }
 }

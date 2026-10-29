@@ -82,5 +82,55 @@ namespace ScoreManager {
             var wStudentScore = new StudentScore(wName, wSubject, int.Parse(wScoreText));
             FStudentScores.Add(wStudentScore);
         }
+
+        /// <summary>
+        /// 成績一覧を表示するメソッド
+        /// </summary>
+        public void DisplayAllScores() {
+
+            int wMaxNameDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Name));
+            int wMaxSubjectDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Subject));
+            int wMaxScoreDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Score.ToString()));
+
+            foreach (var wStudentScore in FStudentScores) {
+                string wFormat = CreateOutputFormat(wStudentScore, wMaxNameDisplayWidth, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
+                Console.WriteLine(wFormat, wStudentScore.Name, wStudentScore.Subject, wStudentScore.Score);
+            }
+        }
+
+        /// <summary>
+        /// 成績1行の出力書式を作成するメソッド
+        /// </summary>
+        /// <param name="vStudentScore">1つの成績データ</param>
+        /// <param name="vNameDisplayWidth">名前欄に割り当てたい画面表示幅</param>
+        /// <param name="vSubjectDisplayWidth">科目欄に割り当てたい画面表示幅</param>
+        /// <param name="vScoreDisplayWidth">点数欄に割り当てたい画面表示幅</param>
+        /// <returns>出力書式の文字列</returns>
+        private string CreateOutputFormat(StudentScore vStudentScore, int vNameDisplayWidth, int vSubjectDisplayWidth, int vScoreDisplayWidth) {
+
+            int wNameFormatWidth = vNameDisplayWidth - CountZenkaku(vStudentScore.Name);
+            int wSubjectFormatWidth = vSubjectDisplayWidth - CountZenkaku(vStudentScore.Subject);
+
+            string[] wEachFormat = { $"{{0,-{wNameFormatWidth}}}", $"{{1,-{wSubjectFormatWidth}}}", $"{{2,{vScoreDisplayWidth}}}" }; // 点数は全角文字を含まないため、書式指定幅 = 画面表示幅
+            return string.Join(" | ", wEachFormat);
+        }
+
+        /// <summary>
+        /// コンソール画面で表示した時、半角何文字分の幅が必用かを計算するメソッド
+        /// </summary>
+        /// <param name="vText">調べたい文字列</param>
+        /// <returns>画面表示時に必用な幅（半角換算）</returns>
+        private int CalcDisplayWidth(string vText) {
+            return Encoding.GetEncoding("shift_jis").GetByteCount(vText);
+        }
+
+        /// <summary>
+        /// 文字列に含まれる全角文字の数を調べるメソッド
+        /// </summary>
+        /// <param name="vText">調べたい文字列</param>
+        /// <returns>文字列に含まれる全角文字の数</returns>
+        private int CountZenkaku(string vText) {
+            return CalcDisplayWidth(vText) - vText.Length;
+        }
     }
 }
