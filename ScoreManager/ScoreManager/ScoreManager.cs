@@ -34,11 +34,12 @@ namespace ScoreManager {
         /// CSVファイルを読み込み、不正行を除いてリストに格納するメソッド
         /// </summary>
         /// <param name="vFilePath">読み込みたいCSVファイルのパス</param>
-        public void LoadCSV(string vFilePath) {
+        /// <returns>リストに格納された件数（ファイルが存在しなかった場合は-1）</returns>
+        public int LoadCSV(string vFilePath) {
 
             if (!File.Exists(vFilePath)) {
                 Console.WriteLine($"{vFilePath} は存在していません。");
-                return;
+                return -1;
             }
             using (var wFile = new StreamReader(vFilePath, Encoding.UTF8)) {
                 while (!wFile.EndOfStream) {
@@ -50,7 +51,9 @@ namespace ScoreManager {
                     AddValidatedScoreToList(wLine);
                 }
             }
-            Console.WriteLine($"{FStudentScores.Count} 件のデータを読み込みました。");
+            int wValidatedScoreCount = FStudentScores.Count;
+            Console.WriteLine($"{wValidatedScoreCount} 件のデータを読み込みました。");
+            return wValidatedScoreCount;
         }
 
         /// <summary>
