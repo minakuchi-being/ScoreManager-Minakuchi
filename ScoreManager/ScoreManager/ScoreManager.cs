@@ -135,10 +135,10 @@ namespace ScoreManager {
         }
 
         /// <summary>
-        /// コンソール画面で表示した時、半角何文字分の幅が必用かを計算するメソッド
+        /// コンソール画面で表示した時、半角何文字分の幅が必要かを計算するメソッド
         /// </summary>
         /// <param name="vText">調べたい文字列</param>
-        /// <returns>画面表示時に必用な幅（半角換算）</returns>
+        /// <returns>画面表示時に必要な幅（半角換算）</returns>
         private int CalcDisplayWidth(string vText) {
             return C_EncodingShiftJIS.GetByteCount(vText);
         }
