@@ -12,13 +12,19 @@ namespace ScoreManager {
             Console.WriteLine(".exeと同階層にあるCSVファイルから成績データを読み込みます。");
 
             string wFilePath = Path.Combine(AppContext.BaseDirectory, C_DefaultScoreFileName);
-            int wLoadedScoreCount = wScoreManager.LoadCSV(wFilePath);
-            Console.WriteLine();
-
-            if (wLoadedScoreCount < 1) {
-                Console.WriteLine("有効な成績データが1件も存在しません\nアプリケーションを終了します。");
-                return;
+            if (!wScoreManager.TryLoadCSV(wFilePath, out LoadCSVStatusEnum wState)) {
+                switch (wState) {
+                    case LoadCSVStatusEnum.FileNotFound:
+                        Console.WriteLine("指定されたファイルが存在しません。");
+                        Console.WriteLine("アプリケーションを終了します。");
+                        return;
+                    case LoadCSVStatusEnum.NoValidScore:
+                        Console.WriteLine("有効な成績が1件も存在しません。");
+                        Console.WriteLine("アプリケーションを終了します。");
+                        return;
+                }
             }
+            Console.WriteLine();
 
             Console.WriteLine("=== 成績一覧 ===");
             wScoreManager.DisplayAllScores();

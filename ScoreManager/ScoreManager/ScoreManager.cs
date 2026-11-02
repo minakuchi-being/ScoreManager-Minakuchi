@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace ScoreManager {
     /// <summary>
-    /// 生徒のデータを扱う処理を担当するクラス
+    /// 成績に関する処理（画面表示や平均点計算など）を担当するクラス
     /// </summary>
     internal class ScoreManager {
         /// <summary>
@@ -26,6 +26,11 @@ namespace ScoreManager {
         private const string C_RegexPatternOfScoreText = @"^(100|[1-9]?[0-9])$";
 
         /// <summary>
+        /// Shift-JIS のエンコード
+        /// </summary>
+        private static readonly Encoding C_EncodingShiftJIS = Encoding.GetEncoding("shift_jis");
+
+        /// <summary>
         /// 不正でない生徒のデータのクラスを保持するリスト
         /// </summary>
         private List<StudentScore> FStudentScores = new List<StudentScore>();
@@ -34,12 +39,12 @@ namespace ScoreManager {
         /// CSVファイルを読み込み、不正行を除いてリストに格納するメソッド
         /// </summary>
         /// <param name="vFilePath">読み込みたいCSVファイルのパス</param>
-        /// <returns>リストに格納された件数（ファイルが存在しなかった場合は-1）</returns>
-        public int LoadCSV(string vFilePath) {
-
+        /// <param name="vStatus">メソッド終了時の状態</param>
+        /// <returns>今後の処理継続の可否</returns>
+        public bool TryLoadCSV(string vFilePath, out LoadCSVStatusEnum vStatus) {
             if (!File.Exists(vFilePath)) {
-                Console.WriteLine($"{vFilePath} は存在していません。");
-                return -1;
+                vStatus = LoadCSVStatusEnum.FileNotFound;
+                return false;
             }
             using (var wFile = new StreamReader(vFilePath, Encoding.UTF8)) {
                 while (!wFile.EndOfStream) {
@@ -51,17 +56,21 @@ namespace ScoreManager {
                     AddValidatedScoreToList(wLine);
                 }
             }
-            int wValidatedScoreCount = FStudentScores.Count;
-            Console.WriteLine($"{wValidatedScoreCount} 件のデータを読み込みました。");
-            return wValidatedScoreCount;
+            int wValidScoreCount = FStudentScores.Count;
+            if (wValidScoreCount == 0) {
+                vStatus = LoadCSVStatusEnum.NoValidScore;
+                return false;
+            }
+            Console.WriteLine($"{wValidScoreCount} 件のデータを読み込みました。");
+            vStatus = LoadCSVStatusEnum.Success;
+            return true;
         }
 
         /// <summary>
         /// バリデーションに沿った成績のみリストに格納するメソッド
         /// </summary>
-        /// <param name="vLine">CSVの1行</param>  
+        /// <param name="vLine">CSVの1行</param>
         private void AddValidatedScoreToList(string vLine) {
-
             string[] wItems = vLine.Split(',');
             if (wItems.Length != 3 || wItems.Any(x => string.IsNullOrWhiteSpace(x))) {
                 Console.WriteLine($"不正な行（項目数不正）: {vLine}");
@@ -90,32 +99,39 @@ namespace ScoreManager {
         /// 成績一覧を表示するメソッド
         /// </summary>
         public void DisplayAllScores() {
-
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("表示する成績がありません。");
+                return;
+            }
             int wMaxNameDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Name));
             int wMaxSubjectDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Subject));
             int wMaxScoreDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Score.ToString()));
 
             foreach (var wStudentScore in FStudentScores) {
-                string wFormat = CreateOutputFormat(wStudentScore, wMaxNameDisplayWidth, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
-                Console.WriteLine(wFormat, wStudentScore.Name, wStudentScore.Subject, wStudentScore.Score);
+                string wOutputLine = CreateOutputLine(wStudentScore, wMaxNameDisplayWidth, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
+                Console.WriteLine(wOutputLine);
             }
         }
 
         /// <summary>
-        /// 成績1行の出力書式を作成するメソッド
+        /// 成績1行の出力文を作成するメソッド
         /// </summary>
         /// <param name="vStudentScore">1つの成績データ</param>
         /// <param name="vNameDisplayWidth">名前欄に割り当てたい画面表示幅</param>
         /// <param name="vSubjectDisplayWidth">科目欄に割り当てたい画面表示幅</param>
         /// <param name="vScoreDisplayWidth">点数欄に割り当てたい画面表示幅</param>
-        /// <returns>出力書式の文字列</returns>
-        private string CreateOutputFormat(StudentScore vStudentScore, int vNameDisplayWidth, int vSubjectDisplayWidth, int vScoreDisplayWidth) {
+        /// <returns>成績1行の出力文</returns>
+        private string CreateOutputLine(StudentScore vStudentScore, int vNameDisplayWidth, int vSubjectDisplayWidth, int vScoreDisplayWidth) {
+            string wName = vStudentScore.Name;
+            string wSubject = vStudentScore.Subject;
+            int wScore = vStudentScore.Score;
 
-            int wNameFormatWidth = vNameDisplayWidth - CountZenkaku(vStudentScore.Name);
-            int wSubjectFormatWidth = vSubjectDisplayWidth - CountZenkaku(vStudentScore.Subject);
+            var wSpacesAfterName = new string(' ', vNameDisplayWidth - CalcDisplayWidth(wName));
+            var wSpacesAfterSubject = new string(' ', vSubjectDisplayWidth - CalcDisplayWidth(wSubject));
+            var wSpacesBeforeScore = new string(' ', vScoreDisplayWidth - CalcDisplayWidth(wScore.ToString()));
 
-            string[] wEachFormat = { $"{{0,-{wNameFormatWidth}}}", $"{{1,-{wSubjectFormatWidth}}}", $"{{2,{vScoreDisplayWidth}}}" }; // 点数は全角文字を含まないため、書式指定幅 = 画面表示幅
-            return string.Join(" | ", wEachFormat);
+            string[] wEachItem = { wName + wSpacesAfterName, wSubject + wSpacesAfterSubject, wSpacesBeforeScore + wScore };
+            return string.Join(" | ", wEachItem);
         }
 
         /// <summary>
@@ -124,16 +140,7 @@ namespace ScoreManager {
         /// <param name="vText">調べたい文字列</param>
         /// <returns>画面表示時に必用な幅（半角換算）</returns>
         private int CalcDisplayWidth(string vText) {
-            return Encoding.GetEncoding("shift_jis").GetByteCount(vText);
-        }
-
-        /// <summary>
-        /// 文字列に含まれる全角文字の数を調べるメソッド
-        /// </summary>
-        /// <param name="vText">調べたい文字列</param>
-        /// <returns>文字列に含まれる全角文字の数</returns>
-        private int CountZenkaku(string vText) {
-            return CalcDisplayWidth(vText) - vText.Length;
+            return C_EncodingShiftJIS.GetByteCount(vText);
         }
     }
 }
