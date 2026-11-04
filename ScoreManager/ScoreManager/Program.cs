@@ -28,6 +28,12 @@ namespace ScoreManager {
 
             Console.WriteLine("=== 成績一覧 ===");
             wScoreManager.DisplayAllScores();
+            Console.WriteLine();
+
+            Console.WriteLine("=== 全教科平均点 ===");
+            double wOverallAverageScore = wScoreManager.CalcOverallAverageScore();
+            Console.WriteLine($"平均点: {wOverallAverageScore:F2}");
+            Console.WriteLine();
         }
     }
 }
