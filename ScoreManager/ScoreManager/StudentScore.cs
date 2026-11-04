@@ -1,6 +1,6 @@
 ﻿namespace ScoreManager {
     /// <summary>
-    /// 生徒のデータを保持するクラス
+    /// 生徒の成績に関するデータを保持するクラス
     /// </summary>
     internal class StudentScore {
         /// <summary>
@@ -17,7 +17,7 @@
         /// テストの点数
         /// </summary>
         public int Score { get; set; }
-        
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
