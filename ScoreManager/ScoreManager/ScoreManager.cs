@@ -142,5 +142,16 @@ namespace ScoreManager {
         private int CalcDisplayWidth(string vText) {
             return C_EncodingShiftJIS.GetByteCount(vText);
         }
+
+        /// <summary>
+        /// 全教科の平均点を計算するメソッド
+        /// </summary>
+        /// <returns>全教科の平均点（リストが存在しない場合は 0.0）</returns>
+        public double CalcOverallAverageScore() {
+            if (FStudentScores.Count == 0) {
+                return 0.0;
+            }
+            return FStudentScores.Average(x => x.Score);
+        }
     }
 }
