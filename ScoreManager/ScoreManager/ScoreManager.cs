@@ -146,7 +146,7 @@ namespace ScoreManager {
         /// <summary>
         /// 全教科の平均点を計算するメソッド
         /// </summary>
-        /// <returns>全教科の平均点（成績が1件もが存在しない場合は 0.0）</returns>
+        /// <returns>全教科の平均点（成績が1件も存在しない場合は 0.0）</returns>
         public double CalcOverallAverageScore() {
             if (FStudentScores.Count == 0) {
                 return 0.0;
