@@ -161,8 +161,8 @@ namespace ScoreManager {
         /// 全教科の平均点を表示するメソッド
         /// </summary>
         public void DisplayOverallAverageScore() {
-            double vOverallAverageScore = CalcOverallAverageScore();
-            Console.WriteLine($"平均点: {vOverallAverageScore:F2}");
+            double wOverallAverageScore = CalcOverallAverageScore();
+            Console.WriteLine($"平均点: {wOverallAverageScore:F2}");
         }
 
         /// <summary>
@@ -179,7 +179,6 @@ namespace ScoreManager {
         /// <summary>
         /// 各教科の平均点を表示するメソッド
         /// </summary>
-        /// <param name="vSubjectAverageScores">科目名と平均点の辞書</param>
         public void DisplaySubjectAverageScores() {
             Dictionary<string, double> wSubjectAverageScores = CalcSubjectAverageScores();
             if (wSubjectAverageScores.Count == 0) {
