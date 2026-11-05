@@ -158,10 +158,18 @@ namespace ScoreManager {
         }
 
         /// <summary>
+        /// 全教科の平均点を表示するメソッド
+        /// </summary>
+        public void DisplayOverallAverageScore() {
+            double vOverallAverageScore = CalcOverallAverageScore();
+            Console.WriteLine($"平均点: {vOverallAverageScore:F2}");
+        }
+
+        /// <summary>
         /// 全教科の平均点を計算するメソッド
         /// </summary>
         /// <returns>全教科の平均点（成績が1件も存在しない場合は 0.0）</returns>
-        public double CalcOverallAverageScore() {
+        private double CalcOverallAverageScore() {
             if (FStudentScores.Count == 0) {
                 return 0.0;
             }
@@ -169,33 +177,34 @@ namespace ScoreManager {
         }
 
         /// <summary>
+        /// 各教科の平均点を表示するメソッド
+        /// </summary>
+        /// <param name="vSubjectAverageScores">科目名と平均点の辞書</param>
+        public void DisplaySubjectAverageScores() {
+            Dictionary<string, double> wSubjectAverageScores = CalcSubjectAverageScores();
+            if (wSubjectAverageScores.Count == 0) {
+                Console.WriteLine("表示する科目別平均点がありません。");
+                return;
+            }
+            int wMaxSubjectDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Key));
+            int wMaxScoreDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Value.ToString("F2")));
+
+            foreach (KeyValuePair<string, double> wSubjectAverageScore in wSubjectAverageScores) {
+                string wOutputLine = CreateAverageOutputLine(wSubjectAverageScore.Key, wSubjectAverageScore.Value, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
+                Console.WriteLine(wOutputLine);
+            }
+        }
+
+        /// <summary>
         /// 各教科の平均点を計算するメソッド
         /// </summary>
         /// <returns>各教科の平均点の辞書（成績が1件も存在しない場合は空の辞書）</returns>
-        public Dictionary<string, double> CalcSubjectAverageScores() {
+        private Dictionary<string, double> CalcSubjectAverageScores() {
             if (FStudentScores.Count == 0) {
                 return new Dictionary<string, double>();
             }
             var wSubjectAverageScores = FStudentScores.GroupBy(x => x.Subject).ToDictionary(x => x.Key, x => x.Average(y => y.Score));
             return wSubjectAverageScores;
-        }
-
-        /// <summary>
-        /// 各教科の平均点を表示するメソッド
-        /// </summary>
-        /// <param name="vSubjectAverageScores">科目名と平均点の辞書</param>
-        public void DisplaySubjectAverageScores(Dictionary<string, double> vSubjectAverageScores) {
-            if (vSubjectAverageScores.Count == 0) {
-                Console.WriteLine("表示する科目別平均点がありません。");
-                return;
-            }
-            int wMaxSubjectDisplayWidth = vSubjectAverageScores.Max(x => CalcDisplayWidth(x.Key));
-            int wMaxScoreDisplayWidth = vSubjectAverageScores.Max(x => CalcDisplayWidth(x.Value.ToString("F2")));
-
-            foreach (KeyValuePair<string, double> wSubjectAverageScore in vSubjectAverageScores) {
-                string wOutputLine = CreateAverageOutputLine(wSubjectAverageScore.Key, wSubjectAverageScore.Value, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
-                Console.WriteLine(wOutputLine);
-            }
         }
 
         /// <summary>
