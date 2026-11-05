@@ -108,7 +108,7 @@ namespace ScoreManager {
             int wMaxScoreDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Score.ToString()));
 
             foreach (var wStudentScore in FStudentScores) {
-                string wOutputLine = CreateOutputLine(wStudentScore, wMaxNameDisplayWidth, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
+                string wOutputLine = CreateScoreOutputLine(wStudentScore, wMaxNameDisplayWidth, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
                 Console.WriteLine(wOutputLine);
             }
         }
@@ -121,17 +121,31 @@ namespace ScoreManager {
         /// <param name="vSubjectDisplayWidth">科目欄に割り当てたい画面表示幅</param>
         /// <param name="vScoreDisplayWidth">点数欄に割り当てたい画面表示幅</param>
         /// <returns>成績1行の出力文</returns>
-        private string CreateOutputLine(StudentScore vStudentScore, int vNameDisplayWidth, int vSubjectDisplayWidth, int vScoreDisplayWidth) {
-            string wName = vStudentScore.Name;
-            string wSubject = vStudentScore.Subject;
-            int wScore = vStudentScore.Score;
-
-            var wSpacesAfterName = new string(' ', vNameDisplayWidth - CalcDisplayWidth(wName));
-            var wSpacesAfterSubject = new string(' ', vSubjectDisplayWidth - CalcDisplayWidth(wSubject));
-            var wSpacesBeforeScore = new string(' ', vScoreDisplayWidth - CalcDisplayWidth(wScore.ToString()));
-
-            string[] wEachItem = { wName + wSpacesAfterName, wSubject + wSpacesAfterSubject, wSpacesBeforeScore + wScore };
+        private string CreateScoreOutputLine(StudentScore vStudentScore, int vNameDisplayWidth, int vSubjectDisplayWidth, int vScoreDisplayWidth) {
+            string[] wEachItem = { PadRightByDisplayWidth(vStudentScore.Name, vNameDisplayWidth),
+                                   PadRightByDisplayWidth(vStudentScore.Subject, vSubjectDisplayWidth),
+                                   PadLeftByDisplayWidth(vStudentScore.Score.ToString(), vScoreDisplayWidth) };
             return string.Join(" | ", wEachItem);
+        }
+
+        /// <summary>
+        /// 指定された画面表示幅になるように半角スペースを追加して、文字列を左詰めするメソッド
+        /// </summary>
+        /// <param name="vText">左詰めしたい文字列</param>
+        /// <param name="vTextDisplayWidth">画面表示幅</param>
+        /// <returns>空白で左詰めされた文字列</returns>
+        private string PadRightByDisplayWidth(string vText, int vTextDisplayWidth) {
+            return vText + new string(' ', vTextDisplayWidth - CalcDisplayWidth(vText));
+        }
+
+        /// <summary>
+        /// 指定された画面表示幅になるように半角スペースを追加して、文字列を右詰めするメソッド
+        /// </summary>
+        /// <param name="vText">右詰めしたい文字列</param>
+        /// <param name="vTextDisplayWidth">画面表示幅</param>
+        /// <returns>空白で右詰めされた文字列</returns>
+        private string PadLeftByDisplayWidth(string vText, int vTextDisplayWidth) {
+            return new string(' ', vTextDisplayWidth - CalcDisplayWidth(vText)) + vText;
         }
 
         /// <summary>
@@ -144,14 +158,66 @@ namespace ScoreManager {
         }
 
         /// <summary>
+        /// 全教科の平均点を表示するメソッド
+        /// </summary>
+        public void DisplayOverallAverageScore() {
+            double wOverallAverageScore = CalcOverallAverageScore();
+            Console.WriteLine($"平均点: {wOverallAverageScore:F2}");
+        }
+
+        /// <summary>
         /// 全教科の平均点を計算するメソッド
         /// </summary>
         /// <returns>全教科の平均点（成績が1件も存在しない場合は 0.0）</returns>
-        public double CalcOverallAverageScore() {
+        private double CalcOverallAverageScore() {
             if (FStudentScores.Count == 0) {
                 return 0.0;
             }
             return FStudentScores.Average(x => x.Score);
+        }
+
+        /// <summary>
+        /// 各教科の平均点を表示するメソッド
+        /// </summary>
+        public void DisplaySubjectAverageScores() {
+            Dictionary<string, double> wSubjectAverageScores = CalcSubjectAverageScores();
+            if (wSubjectAverageScores.Count == 0) {
+                Console.WriteLine("表示する科目別平均点がありません。");
+                return;
+            }
+            int wMaxSubjectDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Key));
+            int wMaxScoreDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Value.ToString("F2")));
+
+            foreach (KeyValuePair<string, double> wSubjectAverageScore in wSubjectAverageScores) {
+                string wOutputLine = CreateAverageOutputLine(wSubjectAverageScore.Key, wSubjectAverageScore.Value, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
+                Console.WriteLine(wOutputLine);
+            }
+        }
+
+        /// <summary>
+        /// 各教科の平均点を計算するメソッド
+        /// </summary>
+        /// <returns>各教科の平均点の辞書（成績が1件も存在しない場合は空の辞書）</returns>
+        private Dictionary<string, double> CalcSubjectAverageScores() {
+            if (FStudentScores.Count == 0) {
+                return new Dictionary<string, double>();
+            }
+            var wSubjectAverageScores = FStudentScores.GroupBy(x => x.Subject).ToDictionary(x => x.Key, x => x.Average(y => y.Score));
+            return wSubjectAverageScores;
+        }
+
+        /// <summary>
+        /// 平均点1行の出力文を作成する
+        /// </summary>
+        /// <param name="vSubject">科目名</param>
+        /// <param name="vScore">平均点</param>
+        /// <param name="vSubjectDisplayWidth">科目名に割り当てたい画面表示幅</param>
+        /// <param name="vScoreDisplayWidth">平均点欄に割り当てたい画面表示幅</param>
+        /// <returns>平均点1行の出力文</returns>
+        private string CreateAverageOutputLine(string vSubject, double vScore, int vSubjectDisplayWidth, int vScoreDisplayWidth) {
+            string[] wEachItem = { PadRightByDisplayWidth(vSubject, vSubjectDisplayWidth),
+                                   PadLeftByDisplayWidth(vScore.ToString("F2"), vScoreDisplayWidth) };
+            return string.Join(": ", wEachItem);
         }
     }
 }

@@ -31,8 +31,11 @@ namespace ScoreManager {
             Console.WriteLine();
 
             Console.WriteLine("=== 全教科平均点 ===");
-            double wOverallAverageScore = wScoreManager.CalcOverallAverageScore();
-            Console.WriteLine($"平均点: {wOverallAverageScore:F2}");
+            wScoreManager.DisplayOverallAverageScore();
+            Console.WriteLine();
+
+            Console.WriteLine("=== 科目別平均点 ===");
+            wScoreManager.DisplaySubjectAverageScores();
             Console.WriteLine();
         }
     }
