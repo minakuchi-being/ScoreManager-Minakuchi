@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ScoreManager {
@@ -33,6 +34,11 @@ namespace ScoreManager {
             Console.WriteLine("=== 全教科平均点 ===");
             double wOverallAverageScore = wScoreManager.CalcOverallAverageScore();
             Console.WriteLine($"平均点: {wOverallAverageScore:F2}");
+            Console.WriteLine();
+
+            Console.WriteLine("=== 科目別平均点 ===");
+            Dictionary<string, double> wSubjectAverageScores = wScoreManager.CalcSubjectAverageScores();
+            wScoreManager.DisplaySubjectAverageScores(wSubjectAverageScores);
             Console.WriteLine();
         }
     }
