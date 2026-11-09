@@ -256,5 +256,36 @@ namespace ScoreManager {
         private List<StudentScore> GetPassingScores() {
             return FStudentScores.Where(x => x.Score >= C_PassingScoreBorder).ToList();
         }
+
+        /// <summary>
+        /// 科目名でフィルタをかけた成績を表示するメソッド
+        /// </summary>
+        /// <param name="vInput">ユーザーの入力</param>
+        public void DisplaySubjectFilteredScores(string vInput) {
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("フィルタをかける成績がありません。");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(vInput)) {
+                Console.WriteLine("科目名が指定されていません。");
+                return;
+            }
+            List<StudentScore> wSubjectFilteredScores = GetSubjectFilteredScores(vInput);
+            if (wSubjectFilteredScores.Count == 0) {
+                Console.WriteLine($"{vInput} の成績は存在しません。");
+                return;
+            }
+            Console.WriteLine($"{vInput} の 成績一覧");
+            DisplayScores(wSubjectFilteredScores);
+        }
+
+        /// <summary>
+        /// 科目名でフィルタをかけた成績を取得するメソッド
+        /// </summary>
+        /// <param name="vSubject">フィルタをかけたい科目名</param>
+        /// <returns>科目名でフィルタをかけた成績のリスト</returns>
+        private List<StudentScore> GetSubjectFilteredScores(string vSubject) {
+            return FStudentScores.Where(x => string.Equals(vSubject, x.Subject, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
     }
 }
