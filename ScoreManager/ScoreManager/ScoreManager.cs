@@ -264,22 +264,22 @@ namespace ScoreManager {
         /// <summary>
         /// 科目名でフィルタをかけた成績を表示するメソッド
         /// </summary>
-        /// <param name="vInput">ユーザーの入力</param>
-        public void DisplaySubjectFilteredScores(string vInput) {
+        /// <param name="vSubject">フィルタをかけたい科目名</param>
+        public void DisplaySubjectFilteredScores(string vSubject) {
             if (FStudentScores.Count == 0) {
                 Console.WriteLine("フィルタをかける成績がありません。");
                 return;
             }
-            if (string.IsNullOrWhiteSpace(vInput)) {
+            if (string.IsNullOrWhiteSpace(vSubject)) {
                 Console.WriteLine("科目名が指定されていません。");
                 return;
             }
-            List<StudentScore> wSubjectFilteredScores = GetSubjectFilteredScores(vInput);
+            List<StudentScore> wSubjectFilteredScores = GetSubjectFilteredScores(vSubject);
             if (wSubjectFilteredScores.Count == 0) {
-                Console.WriteLine($"{vInput} の成績は存在しません。");
+                Console.WriteLine($"{vSubject} の成績は存在しません。");
                 return;
             }
-            Console.WriteLine($"{vInput} の 成績一覧");
+            Console.WriteLine($"{vSubject} の成績一覧");
             DisplayScores(wSubjectFilteredScores);
         }
 
