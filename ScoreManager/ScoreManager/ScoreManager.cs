@@ -114,7 +114,7 @@ namespace ScoreManager {
         /// <summary>
         /// 与えられたリストに含まれる成績を一覧表示するメソッド
         /// </summary>
-        /// <param name="vStudentScores"></param>
+        /// <param name="vStudentScores">一覧表示したい成績のリスト</param>
         private void DisplayScores(List<StudentScore> vStudentScores) {
             int wMaxNameDisplayWidth = vStudentScores.Max(x => CalcDisplayWidth(x.Name));
             int wMaxSubjectDisplayWidth = vStudentScores.Max(x => CalcDisplayWidth(x.Subject));
@@ -240,7 +240,7 @@ namespace ScoreManager {
                 return;
             }
             List<StudentScore> wPassingScores = GetPassingScores();
-            int wPassingStudentCount = wPassingScores.Count;
+            int wPassingStudentCount = wPassingScores.Select(x => x.Name).Distinct().Count();
             if (wPassingStudentCount == 0) {
                 Console.WriteLine("合格点以上の成績はありません。");
                 return;
@@ -248,7 +248,7 @@ namespace ScoreManager {
             Console.WriteLine($"合格者 {wPassingStudentCount} 人");
             DisplayScores(wPassingScores);
         }
-        
+
         /// <summary>
         /// 合格点以上の成績を取得するメソッド
         /// </summary>
