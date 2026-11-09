@@ -173,6 +173,10 @@ namespace ScoreManager {
         /// 全教科の平均点を表示するメソッド
         /// </summary>
         public void DisplayOverallAverageScore() {
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("平均点を計算する成績がありません。");
+                return;
+            }
             double wOverallAverageScore = CalcOverallAverageScore();
             Console.WriteLine($"平均点: {wOverallAverageScore:F2}");
         }
@@ -192,11 +196,11 @@ namespace ScoreManager {
         /// 各教科の平均点を表示するメソッド
         /// </summary>
         public void DisplaySubjectAverageScores() {
-            Dictionary<string, double> wSubjectAverageScores = CalcSubjectAverageScores();
-            if (wSubjectAverageScores.Count == 0) {
-                Console.WriteLine("表示する科目別平均点がありません。");
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("平均点を計算する成績がありません。");
                 return;
             }
+            Dictionary<string, double> wSubjectAverageScores = CalcSubjectAverageScores();
             int wMaxSubjectDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Key));
             int wMaxScoreDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Value.ToString("F2")));
             foreach (KeyValuePair<string, double> wSubjectAverageScore in wSubjectAverageScores) {
