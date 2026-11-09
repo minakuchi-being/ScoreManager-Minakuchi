@@ -26,6 +26,11 @@ namespace ScoreManager {
         private const string C_RegexPatternOfScoreText = @"^(100|[1-9]?[0-9])$";
 
         /// <summary>
+        /// 合格点のボーダーライン
+        /// </summary>
+        private const int C_PassingScoreBorder = 60;
+
+        /// <summary>
         /// Shift-JIS のエンコード
         /// </summary>
         private static readonly Encoding C_EncodingShiftJIS = Encoding.GetEncoding("shift_jis");
@@ -103,11 +108,18 @@ namespace ScoreManager {
                 Console.WriteLine("表示する成績がありません。");
                 return;
             }
-            int wMaxNameDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Name));
-            int wMaxSubjectDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Subject));
-            int wMaxScoreDisplayWidth = FStudentScores.Max(x => CalcDisplayWidth(x.Score.ToString()));
+            DisplayScores(FStudentScores);
+        }
 
-            foreach (var wStudentScore in FStudentScores) {
+        /// <summary>
+        /// 与えられたリストに含まれる成績を一覧表示するメソッド
+        /// </summary>
+        /// <param name="vStudentScores"></param>
+        private void DisplayScores(List<StudentScore> vStudentScores) {
+            int wMaxNameDisplayWidth = vStudentScores.Max(x => CalcDisplayWidth(x.Name));
+            int wMaxSubjectDisplayWidth = vStudentScores.Max(x => CalcDisplayWidth(x.Subject));
+            int wMaxScoreDisplayWidth = vStudentScores.Max(x => CalcDisplayWidth(x.Score.ToString()));
+            foreach (var wStudentScore in vStudentScores) {
                 string wOutputLine = CreateScoreOutputLine(wStudentScore, wMaxNameDisplayWidth, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
                 Console.WriteLine(wOutputLine);
             }
@@ -187,7 +199,6 @@ namespace ScoreManager {
             }
             int wMaxSubjectDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Key));
             int wMaxScoreDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Value.ToString("F2")));
-
             foreach (KeyValuePair<string, double> wSubjectAverageScore in wSubjectAverageScores) {
                 string wOutputLine = CreateAverageOutputLine(wSubjectAverageScore.Key, wSubjectAverageScore.Value, wMaxSubjectDisplayWidth, wMaxScoreDisplayWidth);
                 Console.WriteLine(wOutputLine);
@@ -218,6 +229,32 @@ namespace ScoreManager {
             string[] wEachItem = { PadRightByDisplayWidth(vSubject, vSubjectDisplayWidth),
                                    PadLeftByDisplayWidth(vScore.ToString("F2"), vScoreDisplayWidth) };
             return string.Join(": ", wEachItem);
+        }
+
+        /// <summary>
+        /// 合格者の成績一覧を表示するメソッド
+        /// </summary>
+        public void DisplayPassingScores() {
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("合格を判定する成績がありません。");
+                return;
+            }
+            List<StudentScore> wPassingScores = GetPassingScores();
+            int wPassingStudentCount = wPassingScores.Count;
+            if (wPassingStudentCount == 0) {
+                Console.WriteLine("合格点以上の成績はありません。");
+                return;
+            }
+            Console.WriteLine($"合格者 {wPassingStudentCount} 人");
+            DisplayScores(wPassingScores);
+        }
+        
+        /// <summary>
+        /// 合格点以上の成績を取得するメソッド
+        /// </summary>
+        /// <returns>合格者一覧のリスト</returns>
+        private List<StudentScore> GetPassingScores() {
+            return FStudentScores.Where(x => x.Score >= C_PassingScoreBorder).ToList();
         }
     }
 }

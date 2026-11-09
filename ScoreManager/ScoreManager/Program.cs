@@ -37,6 +37,10 @@ namespace ScoreManager {
             Console.WriteLine("=== 科目別平均点 ===");
             wScoreManager.DisplaySubjectAverageScores();
             Console.WriteLine();
+
+            Console.WriteLine("=== 合格者一覧 ===");
+            wScoreManager.DisplayPassingScores();
+            Console.WriteLine();
         }
     }
 }
