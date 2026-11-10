@@ -3,7 +3,8 @@ using System.IO;
 
 namespace ScoreManager {
     internal class Program {
-        private const string C_DefaultScoreFileName = "scores.csv";
+        private const string C_DefaultLoadScoresFileName = "scores.csv";
+        private const string C_DefaultExportScoresFileName = "output_scores.csv";
 
         static void Main(string[] args) {
             var wScoreManager = new ScoreManager();
@@ -11,8 +12,8 @@ namespace ScoreManager {
             Console.WriteLine("=== 成績管理アプリ ===");
             Console.WriteLine(".exeと同階層にあるCSVファイルから成績データを読み込みます。");
 
-            string wFilePath = Path.Combine(AppContext.BaseDirectory, C_DefaultScoreFileName);
-            if (!wScoreManager.TryLoadCSV(wFilePath, out LoadCSVStatusEnum wState)) {
+            string wLoadFilePath = Path.Combine(AppContext.BaseDirectory, C_DefaultLoadScoresFileName);
+            if (!wScoreManager.TryLoadCSV(wLoadFilePath, out LoadCSVStatusEnum wState)) {
                 switch (wState) {
                     case LoadCSVStatusEnum.FileNotFound:
                         Console.WriteLine("指定されたファイルが存在しません。");
@@ -46,6 +47,11 @@ namespace ScoreManager {
             Console.Write("科目名を入力：");
             string wInput = Console.ReadLine()?.Trim();
             wScoreManager.DisplaySubjectFilteredScores(wInput);
+            Console.WriteLine();
+
+            Console.WriteLine("=== CSV出力 ===");
+            string wExportFilePath = Path.Combine(AppContext.BaseDirectory, C_DefaultExportScoresFileName);
+            wScoreManager.ExportCSV(wExportFilePath);
             Console.WriteLine();
         }
     }

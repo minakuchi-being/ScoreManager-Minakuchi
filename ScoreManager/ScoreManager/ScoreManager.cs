@@ -291,5 +291,19 @@ namespace ScoreManager {
         private List<StudentScore> GetSubjectFilteredScores(string vSubject) {
             return FStudentScores.Where(x => string.Equals(vSubject, x.Subject, StringComparison.OrdinalIgnoreCase)).ToList();
         }
+
+        /// <summary>
+        /// 有効な成績をCSV形式にして出力するメソッド
+        /// </summary>
+        /// <param name="vFilePath">出力したいCSVファイルのパス</param>
+        public void ExportCSV(string vFilePath) {
+            using (var wFile = new StreamWriter(vFilePath, append: false, Encoding.UTF8)) {
+                wFile.WriteLine("#Name,Subject,Scores");
+                foreach (var wStudentScore in FStudentScores) {
+                    wFile.WriteLine($"{wStudentScore.Name},{wStudentScore.Subject},{wStudentScore.Score}");
+                }
+            }
+            Console.WriteLine($"CSV出力完了：{Path.GetFileName(vFilePath)}");
+        }
     }
 }
