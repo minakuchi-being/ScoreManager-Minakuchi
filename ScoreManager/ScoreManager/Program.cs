@@ -41,6 +41,12 @@ namespace ScoreManager {
             Console.WriteLine("=== 合格者一覧 ===");
             wScoreManager.DisplayPassingScores();
             Console.WriteLine();
+
+            Console.WriteLine("=== 科目フィルタ ===");
+            Console.Write("科目名を入力：");
+            string wInput = Console.ReadLine()?.Trim();
+            wScoreManager.DisplaySubjectFilteredScores(wInput);
+            Console.WriteLine();
         }
     }
 }

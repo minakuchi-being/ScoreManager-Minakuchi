@@ -173,6 +173,10 @@ namespace ScoreManager {
         /// 全教科の平均点を表示するメソッド
         /// </summary>
         public void DisplayOverallAverageScore() {
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("平均点を計算する成績がありません。");
+                return;
+            }
             double wOverallAverageScore = CalcOverallAverageScore();
             Console.WriteLine($"平均点: {wOverallAverageScore:F2}");
         }
@@ -192,11 +196,11 @@ namespace ScoreManager {
         /// 各教科の平均点を表示するメソッド
         /// </summary>
         public void DisplaySubjectAverageScores() {
-            Dictionary<string, double> wSubjectAverageScores = CalcSubjectAverageScores();
-            if (wSubjectAverageScores.Count == 0) {
-                Console.WriteLine("表示する科目別平均点がありません。");
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("平均点を計算する成績がありません。");
                 return;
             }
+            Dictionary<string, double> wSubjectAverageScores = CalcSubjectAverageScores();
             int wMaxSubjectDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Key));
             int wMaxScoreDisplayWidth = wSubjectAverageScores.Max(x => CalcDisplayWidth(x.Value.ToString("F2")));
             foreach (KeyValuePair<string, double> wSubjectAverageScore in wSubjectAverageScores) {
@@ -255,6 +259,37 @@ namespace ScoreManager {
         /// <returns>合格者一覧のリスト</returns>
         private List<StudentScore> GetPassingScores() {
             return FStudentScores.Where(x => x.Score >= C_PassingScoreBorder).ToList();
+        }
+
+        /// <summary>
+        /// 科目名でフィルタをかけた成績を表示するメソッド
+        /// </summary>
+        /// <param name="vSubject">フィルタをかけたい科目名</param>
+        public void DisplaySubjectFilteredScores(string vSubject) {
+            if (FStudentScores.Count == 0) {
+                Console.WriteLine("フィルタをかける成績がありません。");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(vSubject)) {
+                Console.WriteLine("科目名が指定されていません。");
+                return;
+            }
+            List<StudentScore> wSubjectFilteredScores = GetSubjectFilteredScores(vSubject);
+            if (wSubjectFilteredScores.Count == 0) {
+                Console.WriteLine($"{vSubject} の成績は存在しません。");
+                return;
+            }
+            Console.WriteLine($"{vSubject} の成績一覧");
+            DisplayScores(wSubjectFilteredScores);
+        }
+
+        /// <summary>
+        /// 科目名でフィルタをかけた成績を取得するメソッド
+        /// </summary>
+        /// <param name="vSubject">フィルタをかけたい科目名</param>
+        /// <returns>科目名でフィルタをかけた成績のリスト</returns>
+        private List<StudentScore> GetSubjectFilteredScores(string vSubject) {
+            return FStudentScores.Where(x => string.Equals(vSubject, x.Subject, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 }
