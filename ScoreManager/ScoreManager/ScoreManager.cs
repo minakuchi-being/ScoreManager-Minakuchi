@@ -305,25 +305,17 @@ namespace ScoreManager {
                     }
                 }
                 Console.WriteLine($"CSV出力完了: {vFilePath}");
-            } catch (Exception wException){
-                Console.WriteLine("!! エラー !!");
-                switch (wException) {
-                    case DirectoryNotFoundException _:
-                        Console.WriteLine("出力先のフォルダーが見つかりません。");
-                        break;
-                    case IOException _:
-                        Console.WriteLine("ファイルへの書き込みに失敗しました。");
-                        Console.WriteLine("ファイルが開かれていないか確認してください。");
-                        break;
-                    case UnauthorizedAccessException _:
-                        Console.WriteLine("ファイルの書き込み権限がありません。");
-                        Console.WriteLine("ファイルの読み取り専用設定などを確認してください。");
-                        break;
-                    default:
-                        Console.WriteLine("CSV出力中に予期しないエラーが発生しました。");
-                        Console.WriteLine(wException.Message);
-                        break;
-                }
+            } catch (DirectoryNotFoundException) {
+                Console.WriteLine("出力先のフォルダーが見つかりません。");
+                return;
+            } catch (UnauthorizedAccessException) {
+                Console.WriteLine("ファイルの書き込み権限がありません。");
+                Console.WriteLine("ファイルの読み取り専用設定などを確認してください。");
+                return;
+            } catch (IOException) {
+                Console.WriteLine("ファイルへの書き込みに失敗しました。");
+                Console.WriteLine("ファイルが開かれていないか確認してください。");
+                return;
             }
         }
     }
