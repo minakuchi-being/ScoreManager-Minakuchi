@@ -51,9 +51,9 @@ namespace ScoreManager {
                 vStatus = LoadCSVStatusEnum.FileNotFound;
                 return false;
             }
-            using (var wFile = new StreamReader(vFilePath, Encoding.UTF8)) {
-                while (!wFile.EndOfStream) {
-                    string wLine = wFile.ReadLine();
+            using (var wReader = new StreamReader(vFilePath, Encoding.UTF8)) {
+                while (!wReader.EndOfStream) {
+                    string wLine = wReader.ReadLine();
 
                     if (string.IsNullOrWhiteSpace(wLine) || wLine.TrimStart().StartsWith("#")) {
                         continue;
@@ -290,6 +290,33 @@ namespace ScoreManager {
         /// <returns>科目名でフィルタをかけた成績のリスト</returns>
         private List<StudentScore> GetSubjectFilteredScores(string vSubject) {
             return FStudentScores.Where(x => string.Equals(vSubject, x.Subject, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        /// <summary>
+        /// 有効な成績をCSV形式にして出力するメソッド
+        /// </summary>
+        /// <param name="vFilePath">出力したいCSVファイルのパス</param>
+        public void ExportCSV(string vFilePath) {
+            try {
+                using (var wWriter = new StreamWriter(vFilePath, append: false, Encoding.UTF8)) {
+                    wWriter.WriteLine("#Name,Subject,Score");
+                    foreach (var wStudentScore in FStudentScores) {
+                        wWriter.WriteLine($"{wStudentScore.Name},{wStudentScore.Subject},{wStudentScore.Score}");
+                    }
+                }
+                Console.WriteLine($"CSV出力完了: {vFilePath}");
+            } catch (DirectoryNotFoundException) {
+                Console.WriteLine("出力先のフォルダーが見つかりません。");
+                return;
+            } catch (UnauthorizedAccessException) {
+                Console.WriteLine("ファイルの書き込み権限がありません。");
+                Console.WriteLine("ファイルの読み取り専用設定などを確認してください。");
+                return;
+            } catch (IOException) {
+                Console.WriteLine("ファイルへの書き込みに失敗しました。");
+                Console.WriteLine("ファイルが開かれていないか確認してください。");
+                return;
+            }
         }
     }
 }
