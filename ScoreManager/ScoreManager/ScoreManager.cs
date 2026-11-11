@@ -51,9 +51,9 @@ namespace ScoreManager {
                 vStatus = LoadCSVStatusEnum.FileNotFound;
                 return false;
             }
-            using (var wFile = new StreamReader(vFilePath, Encoding.UTF8)) {
-                while (!wFile.EndOfStream) {
-                    string wLine = wFile.ReadLine();
+            using (var wReader = new StreamReader(vFilePath, Encoding.UTF8)) {
+                while (!wReader.EndOfStream) {
+                    string wLine = wReader.ReadLine();
 
                     if (string.IsNullOrWhiteSpace(wLine) || wLine.TrimStart().StartsWith("#")) {
                         continue;
@@ -297,13 +297,34 @@ namespace ScoreManager {
         /// </summary>
         /// <param name="vFilePath">出力したいCSVファイルのパス</param>
         public void ExportCSV(string vFilePath) {
-            using (var wFile = new StreamWriter(vFilePath, append: false, Encoding.UTF8)) {
-                wFile.WriteLine("#Name,Subject,Scores");
-                foreach (var wStudentScore in FStudentScores) {
-                    wFile.WriteLine($"{wStudentScore.Name},{wStudentScore.Subject},{wStudentScore.Score}");
+            try {
+                using (var wWriter = new StreamWriter(vFilePath, append: false, Encoding.UTF8)) {
+                    wWriter.WriteLine("#Name,Subject,Score");
+                    foreach (var wStudentScore in FStudentScores) {
+                        wWriter.WriteLine($"{wStudentScore.Name},{wStudentScore.Subject},{wStudentScore.Score}");
+                    }
+                }
+                Console.WriteLine($"CSV出力完了: {vFilePath}");
+            } catch (Exception wException){
+                Console.WriteLine("!! エラー !!");
+                switch (wException) {
+                    case DirectoryNotFoundException _:
+                        Console.WriteLine("出力先のフォルダーが見つかりません。");
+                        break;
+                    case IOException _:
+                        Console.WriteLine("ファイルへの書き込みに失敗しました。");
+                        Console.WriteLine("ファイルが開かれていないか確認してください。");
+                        break;
+                    case UnauthorizedAccessException _:
+                        Console.WriteLine("ファイルの書き込み権限がありません。");
+                        Console.WriteLine("ファイルの読み取り専用設定などを確認してください。");
+                        break;
+                    default:
+                        Console.WriteLine("CSV出力中に予期しないエラーが発生しました。");
+                        Console.WriteLine(wException.Message);
+                        break;
                 }
             }
-            Console.WriteLine($"CSV出力完了：{Path.GetFileName(vFilePath)}");
         }
     }
 }
