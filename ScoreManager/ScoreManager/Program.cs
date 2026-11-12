@@ -17,13 +17,15 @@ namespace ScoreManager {
                 switch (wState) {
                     case LoadCSVStatusEnum.FileNotFound:
                         Console.WriteLine("指定されたファイルが存在しません。");
-                        Console.WriteLine("アプリケーションを終了します。");
-                        return;
+                        break;
                     case LoadCSVStatusEnum.NoValidScore:
                         Console.WriteLine("有効な成績が1件も存在しません。");
-                        Console.WriteLine("アプリケーションを終了します。");
-                        return;
+                        break;
                 }
+                Console.WriteLine("アプリケーションを終了します。");
+                Console.WriteLine("任意のキーを押すと終了します。");
+                Console.ReadKey(intercept: true);
+                return;
             }
             Console.WriteLine();
 
@@ -77,6 +79,8 @@ namespace ScoreManager {
 
                     case "0":
                         Console.WriteLine("アプリケーションを終了します。");
+                        Console.WriteLine("任意のキーを押すと終了します。");
+                        Console.ReadKey(intercept: true);
                         return;
 
                     default:
